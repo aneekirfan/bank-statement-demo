@@ -1,0 +1,25 @@
+[theme]
+# 1. PRIMARY COLOR: This changes the "Upload" & "Download" buttons.
+# Match this to your Google Site's "GST Registration" button color.
+primaryColor = "#1A73E8"  # Example: Google Blue
+
+# 2. BACKGROUND COLOR: The background of the main area.
+# Usually White (#FFFFFF) for professional sites.
+backgroundColor = "#FFFFFF"
+
+# 3. SECONDARY BACKGROUND: The sidebar color.
+# A light grey often looks best here.
+secondaryBackgroundColor = "#F0F2F6"
+
+# 4. TEXT COLOR: The color of your fonts.
+# Use a dark grey/black, not pure black, for easier reading.
+textColor = "#262730"
+
+# 5. FONT: Options are "sans serif", "serif", or "monospace".
+# Google Sites usually use "sans serif" (modern).
+font = "sans serif"
+
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection = false
