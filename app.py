@@ -117,7 +117,7 @@ def process_file(pdf_path, filename):
 col_nav, col_title = st.columns([1, 4])
 with col_nav:
     # This button redirects users back to your main website
-    st.link_button("⬅ Back to Home", "https://sites.google.com/view/humblebees/home") 
+    st.link_button("⬅ Back to Home", "https://www.humblebees.in/home") 
 
 with col_title:
     st.title("Journal/Tally Builder")
@@ -192,3 +192,4 @@ if uploaded_files:
                 with c3:
                     with open(res["tally_path"], "rb") as f:
                         st.download_button("📊 Tally Excel", f, file_name=res["tally_name"])
+
