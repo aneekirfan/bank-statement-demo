@@ -72,6 +72,7 @@ def process_file(pdf_path, filename):
 
         # C. Process Transactions
         entries = []
+        tally_transactions = []
         for txn in context["transactions"]:
             # Skip opening balance rows
             if txn["date"] == "OPENING":
@@ -83,6 +84,7 @@ def process_file(pdf_path, filename):
             # Build Journal Entry
             entry = build_journal_entry(txn, ttype)
             entries.append(entry)
+            tally_transactions.append({"txn": txn, "txn_type": ttype})
 
         if not entries:
             return None, "No valid transactions found in statement."
@@ -97,7 +99,7 @@ def process_file(pdf_path, filename):
 
         # Generate the files using your 'writers' scripts
         generate_journal_pdf(entries, journal_path, account_holder)
-        generate_tally_excel(entries, tally_path)
+        generate_tally_excel(tally_transactions, tally_path, bank)
         
         return {
             "bank": bank,
