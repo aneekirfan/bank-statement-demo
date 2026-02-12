@@ -4,14 +4,32 @@ import re
 # FIX: Supports DD-MM-YYYY, DD/MM/YYYY, and DD/MM/YY
 DATE_RE = re.compile(r"^\d{2}[-/]\d{2}[-/]\d{2,4}")
 
-# Known footer/disclaimer text to ignore (e.g. JKB repeating disclaimer)
-# The disclaimer is split across multiple lines by pdfplumber, so each fragment is listed.
+# Known footer/disclaimer/header text to ignore
+# These repeating lines appear on every page of JKB statements and must be
+# filtered so they don't get appended to the previous transaction's description.
 JUNK_PATTERNS = [
+    # JKB disclaimer block (split across 5 lines)
     "unless the constituent notifies the bank",
     "immediately of any discrepancy found",
     "by him in this statement of account",
     "it will be taken that he has found",
     "the account correct",
+    # Page header / account metadata
+    "printed by",
+    "statement of account",
+    "interest rate",
+    "ckyc id",
+    "no nomination available",
+    "ifsc code",
+    "micr code",
+    # Column headers & summary lines
+    "date particulars",
+    "withdrawals deposits balance",
+    "effective available amount",
+    "total available amount",
+    "ffd contribution",
+    # Misc
+    "end of statement",
 ]
 
 def extract_transactions(pdf_path):
