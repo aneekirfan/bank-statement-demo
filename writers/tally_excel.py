@@ -13,23 +13,20 @@ BANK_LEDGER_BY_CODE = {
 TRANSFER_NARRATION_KEYWORDS = ["mtfr", "neft", "rtgs", "upi", "imps", "trf", "mbill", "ebil"]
 
 
-def _has_transfer_keyword(description, narration):
-    text = f"{description or ''} {narration or ''}".lower()
-
-    # Explicit exception requested by client: treat "by cash" as Contra-only behavior.
+def _has_transfer_keyword(narration):
+    text = (narration or "").lower()
     if "by cash" in text:
         return False
-
     return any(k in text for k in TRANSFER_NARRATION_KEYWORDS)
 
 
 def _build_ledger_lines(voucher_type, txn, txn_type, amount, bank_ledger, narration):
     party_ledger = party_ledger_name(txn["description"])
     direction = txn.get("direction")
-    has_transfer_keyword = _has_transfer_keyword(txn.get("description", ""), narration)
+    has_transfer_keyword = _has_transfer_keyword(narration)
 
     if voucher_type == "Receipt":
-        credit_ledger = "SALE" if has_transfer_keyword else party_ledger
+        credit_ledger = "Sale" if has_transfer_keyword else party_ledger
         return [
             (credit_ledger, amount, "Cr"),
             (bank_ledger, amount, "Dr"),
