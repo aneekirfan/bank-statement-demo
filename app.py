@@ -26,6 +26,7 @@ st.markdown("""
 
 # --- 2. IMPORTS (Project Modules) ---
 # Note: specific imports from your project structure
+from parser.context_builder import build_statement_context
 from parser.account_holder import extract_account_holder_name
 from parser.bank_detector import detect_bank
 from adapters import get_adapter

@@ -26,10 +26,10 @@ def _has_transfer_keyword(description, narration):
 def _build_ledger_lines(voucher_type, txn, txn_type, amount, bank_ledger, narration):
     party_ledger = party_ledger_name(txn["description"])
     direction = txn.get("direction")
-    has_transfer_keyword = _has_transfer_keyword(txn.get("description", ""), narration)
+    has_transfer_keyword = _has_transfer_keyword(narration)
 
     if voucher_type == "Receipt":
-        credit_ledger = "SALE" if has_transfer_keyword else party_ledger
+        credit_ledger = "Sale" if has_transfer_keyword else party_ledger
         return [
             (credit_ledger, amount, "Cr"),
             (bank_ledger, amount, "Dr"),
