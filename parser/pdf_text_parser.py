@@ -4,6 +4,16 @@ import re
 # FIX: Supports DD-MM-YYYY, DD/MM/YYYY, and DD/MM/YY
 DATE_RE = re.compile(r"^\d{2}[-/]\d{2}[-/]\d{2,4}")
 
+# Known footer/disclaimer text to ignore (e.g. JKB repeating disclaimer)
+# The disclaimer is split across multiple lines by pdfplumber, so each fragment is listed.
+JUNK_PATTERNS = [
+    "unless the constituent notifies the bank",
+    "immediately of any discrepancy found",
+    "by him in this statement of account",
+    "it will be taken that he has found",
+    "the account correct",
+]
+
 def extract_transactions(pdf_path):
     transactions = []
     current = None
@@ -20,6 +30,10 @@ def extract_transactions(pdf_path):
                 # 1. Clean CSV artifacts
                 clean_line = line.replace('"', '').replace("','", " ").strip()
                 if not clean_line:
+                    continue
+
+                # 1.5 Skip known junk/disclaimer lines
+                if any(pat in clean_line.lower() for pat in JUNK_PATTERNS):
                     continue
 
                 # 2. Skip Totals
