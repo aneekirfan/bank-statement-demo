@@ -13,10 +13,13 @@ BANK_LEDGER_BY_CODE = {
 TRANSFER_NARRATION_KEYWORDS = ["mtfr", "neft", "rtgs", "upi", "imps", "trf", "mbill", "ebil"]
 
 
-def _has_transfer_keyword(narration):
-    text = (narration or "").lower()
+def _has_transfer_keyword(description, narration):
+    text = f"{description or ''} {narration or ''}".lower()
+
+    # Explicit exception requested by client: treat "by cash" as Contra-only behavior.
     if "by cash" in text:
         return False
+
     return any(k in text for k in TRANSFER_NARRATION_KEYWORDS)
 
 
