@@ -5,7 +5,8 @@ def build_journal_entry(txn, txn_type):
     # Use 'amount' which is consistent across all normalized rows
     amount = txn["amount"]
     date = txn["date"]
-    narration = limited_narration(txn["description"])
+    raw_description = txn["description"]
+    narration = limited_narration(raw_description)
 
     debit = ""
     credit = ""
@@ -38,10 +39,21 @@ def build_journal_entry(txn, txn_type):
         debit = LEDGER_MAP["purchase"]
         credit = LEDGER_MAP["bank"]
 
+    # --- VOUCHER TYPE DETERMINATION ---
+    # Priority: CDR keyword (Contra) > Sales (Receipt) > Everything else (Payment)
+    if "cdr" in raw_description.lower():
+        voucher_type = "Contra"
+    elif txn_type == "sales":
+        voucher_type = "Receipt"
+    else:
+        voucher_type = "Payment"
+
     return {
         "date": date,
         "debit": debit,
         "credit": credit,
         "amount": amount,
-        "narration": narration
+        "narration": narration,
+        "raw_description": raw_description,
+        "voucher_type": voucher_type
     }
