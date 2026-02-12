@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 
+from accounting.narration import limited_narration
 from accounting.tally_voucher import detect_voucher_type, party_ledger_name
 
 BANK_LEDGER_BY_CODE = {
@@ -80,6 +81,7 @@ def generate_tally_excel(transactions_with_type, output_path, bank_code=None):
         amount = round(float(txn["amount"]), 2)
 
         voucher_type = detect_voucher_type(txn, txn_type)
+        narration = limited_narration(txn["description"])
         ledger_lines = _build_ledger_lines(voucher_type, txn, amount, bank_ledger)
 
         for idx, (ledger_name, ledger_amount, dr_cr) in enumerate(ledger_lines):
@@ -90,6 +92,7 @@ def generate_tally_excel(transactions_with_type, output_path, bank_code=None):
                 "Ledger Name": ledger_name,
                 "Ledger Amount": ledger_amount,
                 "Ledger Amount Dr/Cr": dr_cr,
+                "Narration": narration,
             })
 
         voucher_number += 1
@@ -101,6 +104,7 @@ def generate_tally_excel(transactions_with_type, output_path, bank_code=None):
         "Ledger Name",
         "Ledger Amount",
         "Ledger Amount Dr/Cr",
+        "Narration",
     ])
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
