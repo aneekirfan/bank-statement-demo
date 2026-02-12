@@ -28,7 +28,7 @@ def classify_transaction(txn):
     # --- 3. BANK CHARGES ---
     # We check these BEFORE "transfers" because sometimes "NEFT CHARGES" 
     # has both words. We want it to be a Charge, not a Transfer.
-    charge_keywords = ["sms", "cibil", "fee", "inspc", "commissio", "charge", "chrg"]
+    charge_keywords = ["sms", "cibil", "fee", "inspc", "commissio", "charge", "chrg", "recovery"]
     
     if any(x in desc for x in charge_keywords):
         # EXCEPTION: "Recharge" is already caught in Step 1.
