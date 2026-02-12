@@ -44,6 +44,7 @@ def process_all_files():
 
             # 3. Process Transactions
             entries = []
+            tally_transactions = []
             for txn in context["transactions"]:
                 # SKIP the special 'OPENING' row for Journal/Tally
                 # (It was only used internally to calculate the first balance)
@@ -52,6 +53,7 @@ def process_all_files():
 
                 ttype = classify_transaction(txn)
                 entries.append(build_journal_entry(txn, ttype))
+                tally_transactions.append({"txn": txn, "txn_type": ttype})
 
             if not entries:
                 print("  WARNING: No transactions found. Skipping output generation.")
@@ -65,7 +67,7 @@ def process_all_files():
             tally_path = os.path.join(OUTPUT_DIR, f"{stem} Tally.xlsx")
 
             generate_journal_pdf(entries, journal_path, account_holder)
-            generate_tally_excel(entries, tally_path)
+            generate_tally_excel(tally_transactions, tally_path, bank)
             
             print(f"  Success! Output saved to: {journal_path}")
 
