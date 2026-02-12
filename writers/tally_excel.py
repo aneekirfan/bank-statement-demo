@@ -10,20 +10,37 @@ BANK_LEDGER_BY_CODE = {
     "JKB": "J&K Bank",
 }
 
+TRANSFER_NARRATION_KEYWORDS = ["mtfr", "neft", "rtgs", "upi", "imps", "trf", "mbill", "ebil"]
 
-def _build_ledger_lines(voucher_type, txn, amount, bank_ledger):
+
+def _has_transfer_keyword(narration):
+    text = (narration or "").lower()
+    if "by cash" in text:
+        return False
+    return any(k in text for k in TRANSFER_NARRATION_KEYWORDS)
+
+
+def _build_ledger_lines(voucher_type, txn, txn_type, amount, bank_ledger, narration):
     party_ledger = party_ledger_name(txn["description"])
     direction = txn.get("direction")
+    has_transfer_keyword = _has_transfer_keyword(narration)
 
     if voucher_type == "Receipt":
+        credit_ledger = "Sale" if has_transfer_keyword else party_ledger
         return [
-            (party_ledger, amount, "Cr"),
+            (credit_ledger, amount, "Cr"),
             (bank_ledger, amount, "Dr"),
         ]
 
     if voucher_type == "Payment":
+        debit_ledger = party_ledger
+        if txn_type == "bank_charges":
+            debit_ledger = "Bank Charges"
+        elif has_transfer_keyword:
+            debit_ledger = "Purchase"
+
         return [
-            (party_ledger, amount, "Dr"),
+            (debit_ledger, amount, "Dr"),
             (bank_ledger, amount, "Cr"),
         ]
 
@@ -48,12 +65,6 @@ def _build_ledger_lines(voucher_type, txn, amount, bank_ledger):
 
         return [
             ("Cash", amount, "Dr"),
-            (bank_ledger, amount, "Cr"),
-        ]
-
-    if voucher_type == "Bank Charges":
-        return [
-            ("Bank Charges", amount, "Dr"),
             (bank_ledger, amount, "Cr"),
         ]
 
@@ -82,7 +93,7 @@ def generate_tally_excel(transactions_with_type, output_path, bank_code=None):
 
         voucher_type = detect_voucher_type(txn, txn_type)
         narration = limited_narration(txn["description"])
-        ledger_lines = _build_ledger_lines(voucher_type, txn, amount, bank_ledger)
+        ledger_lines = _build_ledger_lines(voucher_type, txn, txn_type, amount, bank_ledger, narration)
 
         for idx, (ledger_name, ledger_amount, dr_cr) in enumerate(ledger_lines):
             rows.append({
