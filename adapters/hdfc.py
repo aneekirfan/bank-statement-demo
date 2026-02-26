@@ -1,6 +1,9 @@
 from adapters.generic import GenericAdapter
 
+
 class HDFCAdapter(GenericAdapter):
+    """Adapter for HDFC Bank statements."""
+
     def build_context(self, pdf_path):
         context = super().build_context(pdf_path)
         context["bank"] = "HDFC"
