@@ -24,43 +24,81 @@ def generate_journal_pdf(entries, output_path, account_holder_name):
     elements.append(Spacer(1, 10*mm))
     
     # 2. Prepare Table Data
+    # --- SIMPLIFIED OUTPUT: Only Date, Narration, Debit, Credit ---
     # Headers
     data = [[
         Paragraph("<b>Date</b>", styles["Normal"]),
-        Paragraph("<b>Particulars</b>", styles["Normal"]),
+        Paragraph("<b>Narration</b>", styles["Normal"]),
         Paragraph("<b>Debit (Rs.)</b>", styles["Normal"]),
         Paragraph("<b>Credit (Rs.)</b>", styles["Normal"])
     ]]
+
+    # --- ORIGINAL HEADERS (commented out for future use) ---
+    # data = [[
+    #     Paragraph("<b>Date</b>", styles["Normal"]),
+    #     Paragraph("<b>Particulars</b>", styles["Normal"]),
+    #     Paragraph("<b>Debit (Rs.)</b>", styles["Normal"]),
+    #     Paragraph("<b>Credit (Rs.)</b>", styles["Normal"])
+    # ]]
     
     normal_style = styles["Normal"]
     
     for e in entries:
         date = e["date"]
-        debit_ledger = e["debit"]
-        credit_ledger = e["credit"]
         amount = f"{e['amount']:,.2f}"
         narration = e.get("narration", "")
-        
-        # Format Particulars Column:
-        # Debit A/c ... Dr
-        #   To Credit A/c
-        #   (Being Narration...)
-        particulars_html = f"""
-        <b>{debit_ledger} Dr.</b><br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;To {credit_ledger}<br/>
-        <font color="grey" size="9"><i>(Being {narration})</i></font>
-        """
-        
+
+        # --- SIMPLIFIED OUTPUT: Only Date, Narration, Debit, Credit ---
+        # Determine debit/credit amount based on direction
+        # If the entry debits the bank (i.e., money coming IN = sales/receipt),
+        # it's a credit to the party. If it credits the bank (money going OUT),
+        # it's a debit to the party.
+        debit_ledger = e.get("debit", "")
+        debit_amount = ""
+        credit_amount = ""
+
+        # If Bank A/c is debited, money came IN → show as Credit
+        # If Bank A/c is credited, money went OUT → show as Debit
+        if debit_ledger == "Bank A/c":
+            # Money IN (Sales/Receipt) → Credit column
+            credit_amount = amount
+        else:
+            # Money OUT (Purchase/Payment) → Debit column
+            debit_amount = amount
+
         row = [
             Paragraph(date, normal_style),
-            Paragraph(particulars_html, normal_style),
-            Paragraph(amount, normal_style),
-            Paragraph(amount, normal_style)
+            Paragraph(narration, normal_style),
+            Paragraph(debit_amount, normal_style),
+            Paragraph(credit_amount, normal_style)
         ]
         data.append(row)
+
+        # --- ORIGINAL ROW FORMAT (commented out for future use) ---
+        # debit_ledger = e["debit"]
+        # credit_ledger = e["credit"]
+        # narration = e.get("narration", "")
+        #
+        # # Format Particulars Column:
+        # # Debit A/c ... Dr
+        # #   To Credit A/c
+        # #   (Being Narration...)
+        # particulars_html = f"""
+        # <b>{debit_ledger} Dr.</b><br/>
+        # &nbsp;&nbsp;&nbsp;&nbsp;To {credit_ledger}<br/>
+        # <font color="grey" size="9"><i>(Being {narration})</i></font>
+        # """
+        #
+        # row = [
+        #     Paragraph(date, normal_style),
+        #     Paragraph(particulars_html, normal_style),
+        #     Paragraph(amount, normal_style),
+        #     Paragraph(amount, normal_style)
+        # ]
+        # data.append(row)
         
     # 3. Create Table with Grid Lines
-    # Widths: Date(25), Particulars(95), Dr(35), Cr(35) -> Fits A4
+    # Widths: Date(25), Narration(95), Dr(35), Cr(35) -> Fits A4
     cw = [25*mm, 95*mm, 35*mm, 35*mm]
     
     t = Table(data, colWidths=cw, repeatRows=1)
