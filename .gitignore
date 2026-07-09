@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+temp_input/
+temp_output/
+input/
+output/
+.streamlit/
+.devcontainer/
+*.egg-info/
+dist/
+build/
+.env
